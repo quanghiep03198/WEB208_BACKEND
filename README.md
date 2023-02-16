@@ -1,1 +1,3 @@
-# WEB209_BACKEND
+`npm run dev` 
+Run server in development environment
+
