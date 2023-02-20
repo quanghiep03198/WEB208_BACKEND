@@ -1,15 +1,15 @@
-import mongoose, { MongooseError, ObjectId } from "mongoose";
+import mongoose, { MongooseError, Types } from "mongoose";
 import ProjectModel, { Project } from "../models/project.model";
+import TaskModel from "../models/task.model";
 
 const ProjectService = {
     // get all joined project
     async getAllJoinedProjects(userId: string) {
         try {
             const joinedProjects = await ProjectModel.find({
-                members: { $elemMatch: { member: userId } },
+                $or: [{ members: { $elemMatch: { info: userId } } }, { creator: userId }],
             }).exec();
-            if (!joinedProjects)
-                throw new MongooseError("Cannot find any joined projects!");
+            if (!joinedProjects) throw new MongooseError("Cannot find any joined projects!");
             return joinedProjects;
         } catch (error) {
             throw error as MongooseError;
@@ -18,13 +18,8 @@ const ProjectService = {
     // get 1 joined project
     async getJoinedProject(projectId: string, userId: string) {
         try {
-            console.log("project id: ", projectId);
-            console.log("userId: ", userId);
             return await ProjectModel.findOne({
-                $and: [
-                    { _id: projectId },
-                    { members: { $elemMatch: { member: userId } } },
-                ],
+                $and: [{ _id: projectId }, { members: { $elemMatch: { info: userId } } }],
             }).exec();
         } catch (error) {
             console.log(error);
@@ -37,8 +32,7 @@ const ProjectService = {
             const joinedProjects = await ProjectModel.find({
                 creator: userId,
             }).exec();
-            if (!joinedProjects)
-                throw new MongooseError("Cannot find any joined projects!");
+            if (!joinedProjects) throw new MongooseError("Cannot find any joined projects!");
             return joinedProjects;
         } catch (error) {
             throw error as MongooseError;
@@ -51,8 +45,7 @@ const ProjectService = {
                 _id: projectId,
                 creator: userId,
             }).exec();
-            if (!joinedProject)
-                throw new MongooseError("Cannot find any joined projects!");
+            console.log(joinedProject);
             return joinedProject;
         } catch (error) {
             throw error as MongooseError;
@@ -60,23 +53,17 @@ const ProjectService = {
     },
     async createProject(newProjectData: Project) {
         try {
+            console.log(newProjectData);
             return await new ProjectModel(newProjectData).save();
         } catch (error) {
             throw error as MongooseError;
         }
     },
-    async updateProject(
-        projectId: string,
-        updateProjectData: Partial<Project>,
-    ) {
+    async updateProject(projectId: string, updateProjectData: Partial<Project>) {
         try {
-            const updatedProject = await ProjectModel.findOneAndUpdate(
-                { _id: projectId },
-                updateProjectData,
-                {
-                    new: true,
-                },
-            ).exec();
+            const updatedProject = await ProjectModel.findOneAndUpdate({ _id: projectId }, updateProjectData, {
+                new: true,
+            }).exec();
 
             return updatedProject;
         } catch (error) {
@@ -85,24 +72,17 @@ const ProjectService = {
     },
     async addMemberToProject(projectId: string, memberId: string) {
         try {
-            const joinedProject = await this.getJoinedProject(
-                projectId,
-                memberId,
-            );
-            console.log(joinedProject);
-            if (joinedProject) return joinedProject;
             const result = await ProjectModel.findOneAndUpdate(
                 {
                     _id: projectId,
                 },
                 {
-                    $push: { members: { member: memberId, role: "MEMBER" } },
+                    $push: { members: { info: memberId, role: "MEMBER" } },
                 },
                 { new: true, upsert: true },
             ).exec();
             return result;
         } catch (error) {
-            console.log(error);
             throw error;
         }
     },
@@ -123,9 +103,12 @@ const ProjectService = {
     },
     async deleteProject(projectId: string) {
         try {
-            return await ProjectModel.findOneAndDelete({
+            const projectObjectId = new mongoose.Types.ObjectId(projectId);
+            const deletedProject = ProjectModel.findOneAndDelete({
                 _id: projectId,
             }).exec();
+            const deletedTasks = TaskModel.deleteMany({ project: projectObjectId });
+            return await Promise.all([deletedProject, deletedTasks]);
         } catch (error) {
             throw error as MongooseError;
         }

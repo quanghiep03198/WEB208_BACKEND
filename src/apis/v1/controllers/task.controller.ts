@@ -38,14 +38,10 @@ const TaskController = {
 
     async updateTask(req: Request, res: Response) {
         try {
-            if (!req.params.taskId) {
-                throw createHttpError.NotFound("Task ID is invalid!");
+            if (!req.params.taskId || !req.body || !req.query.projectId) {
+                throw createHttpError.NotFound("Unacceptable request!");
             }
-            if (!req.body) {
-                throw createHttpError.BadRequest(
-                    "Update task data must be provided!",
-                );
-            }
+
             const updatedTask = await TaskService.updateTask(
                 req.params.taskId,
                 req.body,

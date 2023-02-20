@@ -1,16 +1,16 @@
-import { Schema, model, Types, ObjectId } from "mongoose";
+import mongoose from "mongoose";
 import mongooseAutoPopulate from "mongoose-autopopulate";
 import { User } from "./user.model";
 
 export interface Project {
-    _id: string | ObjectId;
+    _id: string;
     projectName: string;
-    member: Array<ObjectId | Omit<User, "password">>;
+    members: Array<Omit<User, "password"> | any>;
     createdAt: Date;
     updatedAt: Date;
 }
 
-const ProjectSchema = new Schema(
+const ProjectSchema = new mongoose.Schema(
     {
         projectName: {
             type: String,
@@ -19,17 +19,16 @@ const ProjectSchema = new Schema(
             require: true,
         },
         creator: {
-            type: Types.ObjectId,
+            type: mongoose.Types.ObjectId,
             ref: "Users",
             autopopulate: { select: "-password -__v" },
         },
         members: [
             {
-                member: {
-                    type: Types.ObjectId,
+                info: {
+                    type: mongoose.Types.ObjectId,
                     ref: "Users",
                     autopopulate: { select: "-password -__v" },
-                    unique: true,
                 },
                 role: {
                     type: String,
@@ -44,12 +43,14 @@ const ProjectSchema = new Schema(
 );
 ProjectSchema.plugin(mongooseAutoPopulate);
 ProjectSchema.pre("save", function (next) {
-    if (this.members.length > 0) {
-        this.members[0].role = "PROJECT_MANAGER";
-    }
+    this.members.push({
+        info: this.creator,
+        role: "PROJECT_MANAGER",
+    });
+
     next();
 });
 
-const ProjectModel = model<Project>("Projects", ProjectSchema);
+const ProjectModel = mongoose.model<Project>("Projects", ProjectSchema);
 
 export default ProjectModel;

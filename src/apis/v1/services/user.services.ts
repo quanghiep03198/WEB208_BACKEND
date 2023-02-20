@@ -5,7 +5,9 @@ import UserModel, { User } from "../models/user.model";
 const UserService = {
     async login(data: Partial<User>) {
         try {
-            const user = (await UserModel.findOne({ email: data.email }).exec()) as User;
+            const user = (await UserModel.findOne({
+                email: data.email,
+            }).exec()) as User;
             if (!user) throw createHttpError.NotFound("Account does not exist!");
             if (!user.authenticate(data.password as string)) throw createHttpError.BadRequest("Password is incorrect!");
 
@@ -16,14 +18,16 @@ const UserService = {
     },
     async register(data: Partial<User>) {
         try {
-            const existedUser = await UserModel.findOne({ email: data.email }).exec();
+            const existedUser = await UserModel.findOne({
+                email: data.email,
+            }).exec();
             if (existedUser) throw new Error("Account already exited!");
             const newUser = await new UserModel(data).save();
 
             return newUser;
         } catch (error) {
             console.log((error as MongooseError).message);
-            throw error as MongooseError;
+            throw error as MongooseError | Error;
         }
     },
     async getUser(credential: string) {
@@ -41,10 +45,10 @@ const UserService = {
             })
                 .select("-password")
                 .exec();
-            if (!users) throw new MongooseError("Cannot find user!");
+            console.log(searchTermPattern);
             return users;
         } catch (error) {
-            return error as MongooseError;
+            throw error as MongooseError;
         }
     },
 };

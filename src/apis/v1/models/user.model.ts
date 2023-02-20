@@ -1,6 +1,5 @@
-import { model, ObjectId, Schema, Types } from "mongoose";
-import bcrypt, { genSaltSync } from "bcrypt";
-import { Request } from "express";
+import bcrypt from "bcrypt";
+import { model, ObjectId, Schema } from "mongoose";
 
 export interface User extends Document {
     _id: string | ObjectId;
@@ -24,7 +23,8 @@ const UserSchema = new Schema({
             validator: function (value: string) {
                 return /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g.test(value);
             },
-            message: (props: any) => `${props.value} is not a valid email address!`,
+            message: (props: any) =>
+                `${props.value} is not a valid email address!`,
         },
     },
     password: {
@@ -41,8 +41,7 @@ const UserSchema = new Schema({
     photoUrl: {
         type: String,
         trim: true,
-        default:
-            "https://firebasestorage.googleapis.com/v0/b/music-app-cdef5.appspot.com/o/pictures%2Fdefault-avatar.png?alt=media&token=a70a307e-5ec6-4375-8e0c-b2e926f8c417",
+        default: "",
     },
 });
 
@@ -51,7 +50,12 @@ UserSchema.methods.authenticate = function (entryPassword: string): boolean {
 };
 
 UserSchema.pre("save", function (next) {
-    this.password = bcrypt.hashSync(this.password as string, bcrypt.genSaltSync(10));
+    this.password = bcrypt.hashSync(
+        this.password as string,
+        bcrypt.genSaltSync(10),
+    );
+    this.photoUrl =
+        "https://ui-avatars.com/api/?name=" + this.username?.charAt(0);
     next();
 });
 

@@ -46,9 +46,9 @@ const TaskSchema = new Schema(
             require: true,
             default: function () {
                 const today = new Date();
-                const twoDaysLater = new Date();
-                twoDaysLater.setDate(today.getDate() + 3);
-                return twoDaysLater;
+                const threeDaysLater = new Date();
+                threeDaysLater.setDate(today.getDate() + 3);
+                return threeDaysLater;
             },
         },
         status: {

@@ -1,4 +1,4 @@
-import express from "express";
+import express, { NextFunction, Request } from "express";
 
 import cors from "cors";
 import morgan from "morgan";

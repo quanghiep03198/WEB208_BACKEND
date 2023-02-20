@@ -12,11 +12,7 @@ const TaskService = {
     },
     async updateTask(taskId: string, updateData: Partial<Task>) {
         try {
-            return await TaskModel.findOneAndUpdate(
-                { _id: taskId },
-                updateData,
-                { new: true },
-            ).exec();
+            return await TaskModel.findOneAndUpdate({ _id: taskId }, updateData, { new: true }).exec();
         } catch (error) {
             console.log(error);
             throw error as MongooseError;
@@ -31,7 +27,7 @@ const TaskService = {
     },
     async deleteTask(taskId: string) {
         try {
-            return await TaskModel.findOneAndDelete({ _id: taskId }).exec();
+            return await TaskModel.deleteOne({ _id: taskId }).exec();
         } catch (error) {
             throw error as MongooseError;
         }

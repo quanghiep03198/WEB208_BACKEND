@@ -1,22 +1,20 @@
-import UserService from "../services/user.services";
-import { User } from "../models/user.model";
-import jwt from "jsonwebtoken";
-import { Request, Response } from "express";
-import { HttpError } from "http-errors";
-import createHttpError from "http-errors";
 import "dotenv/config";
-import { MongooseError } from "mongoose";
+import { Request, Response } from "express";
+import createHttpError, { HttpError } from "http-errors";
+import jwt from "jsonwebtoken";
+import { User } from "../models/user.model";
+import UserService from "../services/user.services";
 
 const UserController = {
     async login(req: Request, res: Response) {
         try {
             const user = await UserService.login(req.body as Pick<User, "email" & "password">);
 
-            const accessToken = jwt.sign({ credential: (user as User)._id }, process.env.SECRET_KEY!, {
-                expiresIn: "1h",
+            const token = jwt.sign({ auth: (user as Omit<User, "password">)._id }, process.env.SECRET_KEY!, {
+                expiresIn: "30m",
             });
-
-            return res.status(200).json({ accessToken, user });
+            console.log(user);
+            return res.status(200).json({ accessToken: token, auth: user._id });
         } catch (error) {
             return res.status(400).json({
                 message: (error as HttpError).message,
@@ -47,6 +45,28 @@ const UserController = {
             }
             const user = await UserService.getUser(req.auth);
             return res.status(200).json(user);
+        } catch (error) {
+            return res.status((error as HttpError).statusCode).json({
+                message: (error as HttpError).message,
+                statusCode: (error as HttpError).statusCode,
+            });
+        }
+    },
+    async refreshToken(req: Request, res: Response) {
+        try {
+            const newAccessToken = jwt.sign({ auth: req.params.auth }, process.env.SECRET_KEY!, { expiresIn: "1h" });
+            return res.status(200).json(newAccessToken);
+        } catch (error) {
+            return res.status((error as HttpError).statusCode).json({
+                message: (error as HttpError).message,
+                statusCode: (error as HttpError).statusCode,
+            });
+        }
+    },
+    async findUser(req: Request, res: Response) {
+        try {
+            const foundUsers = await UserService.findUser(req.query.searchTerm as string);
+            return res.status(200).json(foundUsers);
         } catch (error) {
             return res.status((error as HttpError).statusCode).json({
                 message: (error as HttpError).message,
