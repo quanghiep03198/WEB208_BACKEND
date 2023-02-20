@@ -5,10 +5,9 @@
     "main": "index.js",
     "scripts": {
         "cleanup": "rm -rf dist && rm -rf build",
-        "webpack": "npx webpack --config webpack.config.js",
-        "start": "node ./dist/server.js",
-        "build": "npx tsc",
-        "dev": "concurrently \"SET NODE_ENV=development && nodemon ./src/server.ts\""
+        "build": "npx webpack --config webpack.config.js",
+        "dev": "concurrently \"SET NODE_ENV=development && nodemon ./src/server.ts\"",
+        "start": "node ./dist/server.js"
     },
     "keywords": [],
     "author": "",
