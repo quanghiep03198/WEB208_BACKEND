@@ -74,6 +74,28 @@ const UserController = {
             });
         }
     },
+    async changePassword(req: Request | any, res: Response) {
+        try {
+            console.log(req.body);
+            return await UserService.changePassword(req.auth, req.body.currentPassword, req.body.newPassword);
+        } catch (error) {
+            return res.status(400).json({
+                message: (error as HttpError).message,
+                status: (error as HttpError).status,
+            });
+        }
+    },
+    async editProfile(req: Request | any, res: Response) {
+        try {
+            const updatedProfile = await UserService.editProfile(req.auth, req.body);
+            return res.status(201).json(updatedProfile);
+        } catch (error) {
+            return res.status(400).json({
+                message: (error as HttpError).message,
+                status: (error as HttpError).status,
+            });
+        }
+    },
 };
 
 export default UserController;
