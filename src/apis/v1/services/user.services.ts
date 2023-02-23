@@ -73,6 +73,9 @@ const UserService = {
     },
     async editProfile(userId: string, updatedUserInfo: Partial<User>) {
         try {
+            if (updatedUserInfo.username) {
+                updatedUserInfo.photoUrl = "https://ui-avatars.com/api/?name=" + updatedUserInfo.username.charAt(0);
+            }
             return await UserModel.findOneAndUpdate({ _id: userId }, updatedUserInfo, { new: true });
         } catch (error) {
             throw error as MongooseError;
