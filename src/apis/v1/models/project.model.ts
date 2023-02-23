@@ -6,7 +6,12 @@ export interface Project {
 	_id: ObjectId;
 	projectName: string;
 	creator: ObjectId;
-	members: Array<Omit<User, "password"> | any>;
+	members: Array<{
+		_id: ObjectId;
+		info: Omit<User, "password">;
+		role: string;
+		joinedAt: Date;
+	}>;
 	createdAt: Date;
 	updatedAt: Date;
 	customer: string;
@@ -34,6 +39,10 @@ const ProjectSchema = new mongoose.Schema(
 					type: mongoose.Types.ObjectId,
 					ref: "Users",
 					autopopulate: { select: "-password -__v" },
+				},
+				joinedAt: {
+					type: Date,
+					default: new Date(),
 				},
 				role: {
 					type: String,
@@ -66,13 +75,14 @@ const ProjectSchema = new mongoose.Schema(
 		toJSON: {
 			virtuals: true,
 		},
-	},
+	}
 );
 ProjectSchema.plugin(mongooseAutoPopulate);
 ProjectSchema.pre("save", function (next) {
 	this.members.push({
 		info: this.creator,
 		role: "PROJECT_MANAGER",
+		joinedAt: new Date(),
 	});
 
 	next();

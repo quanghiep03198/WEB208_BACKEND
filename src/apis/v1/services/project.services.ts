@@ -93,7 +93,7 @@ const ProjectService = {
 			return await ProjectModel.findOneAndUpdate(
 				{ _id: projectId },
 				{
-					$pull: { members: { member: memberId } },
+					$pull: { members: { info: memberId, role: "MEMBER" } },
 				},
 				{ new: true }
 			).exec();
