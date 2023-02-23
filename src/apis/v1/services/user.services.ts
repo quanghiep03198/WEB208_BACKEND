@@ -1,3 +1,4 @@
+import bcrypt from "bcrypt";
 import createHttpError from "http-errors";
 import { MongooseError } from "mongoose";
 import UserModel, { User } from "../models/user.model";
@@ -47,6 +48,35 @@ const UserService = {
                 .exec();
             console.log(searchTermPattern);
             return users;
+        } catch (error) {
+            throw error as MongooseError;
+        }
+    },
+    async changePassword(userId: string, previousPassword: string, newPassword: string) {
+        try {
+            const user = await UserModel.findOne({ _id: userId }).exec();
+            if (!user?.authenticate(previousPassword)) {
+                throw new Error("Current password is incorrect!");
+            }
+            console.log(newPassword);
+            const hashedPassword = bcrypt.hashSync(newPassword, bcrypt.genSaltSync(10));
+            return await UserModel.updateOne(
+                {
+                    _id: userId,
+                },
+                { password: hashedPassword },
+                { new: true },
+            );
+        } catch (error) {
+            throw error;
+        }
+    },
+    async editProfile(userId: string, updatedUserInfo: Partial<User>) {
+        try {
+            if (updatedUserInfo.username) {
+                updatedUserInfo.photoUrl = "https://ui-avatars.com/api/?name=" + updatedUserInfo.username.charAt(0);
+            }
+            return await UserModel.findOneAndUpdate({ _id: userId }, updatedUserInfo, { new: true });
         } catch (error) {
             throw error as MongooseError;
         }

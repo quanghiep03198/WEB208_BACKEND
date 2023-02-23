@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
-import { model, ObjectId, Schema } from "mongoose";
+import mongoose, { ObjectId } from "mongoose";
 
-export interface User extends Document {
+export interface User extends mongoose.Document {
     _id: string | ObjectId;
     username: string;
     password: string;
@@ -13,7 +13,7 @@ export interface User extends Document {
     authenticate(password: string): boolean;
 }
 
-const UserSchema = new Schema({
+const UserSchema = new mongoose.Schema({
     email: {
         type: String,
         require: true,
@@ -23,8 +23,7 @@ const UserSchema = new Schema({
             validator: function (value: string) {
                 return /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g.test(value);
             },
-            message: (props: any) =>
-                `${props.value} is not a valid email address!`,
+            message: (props: any) => `${props.value} is not a valid email address!`,
         },
     },
     password: {
@@ -41,7 +40,7 @@ const UserSchema = new Schema({
     photoUrl: {
         type: String,
         trim: true,
-        default: "",
+        require: true,
     },
 });
 
@@ -49,16 +48,12 @@ UserSchema.methods.authenticate = function (entryPassword: string): boolean {
     return bcrypt.compareSync(entryPassword, this.password);
 };
 
+const UserModel = mongoose.model<User>("Users", UserSchema);
+
 UserSchema.pre("save", function (next) {
-    this.password = bcrypt.hashSync(
-        this.password as string,
-        bcrypt.genSaltSync(10),
-    );
-    this.photoUrl =
-        "https://ui-avatars.com/api/?name=" + this.username?.charAt(0);
+    this.password = bcrypt.hashSync(this.password as string, bcrypt.genSaltSync(10));
+    this.photoUrl = "https://ui-avatars.com/api/?name=" + this.username?.charAt(0);
     next();
 });
-
-const UserModel = model<User>("Users", UserSchema);
 
 export default UserModel;
