@@ -9,7 +9,7 @@ const AuthMiddleware = {
     async checkAuthenticated(req: Request | any, res: Response, next: NextFunction) {
         try {
             let token = req.headers.authorization;
-            if (!token) throw createHttpError.Forbidden("Access token must be provided!");
+            if (!token) throw createHttpError.Unauthorized("Access token must be provided!");
             token = token.split(" ").at(1) as string;
             const decoded = jwt.verify(token, process.env.SECRET_KEY as string) as any;
             const user = (await UserModel.findOne({ _id: decoded.auth }).select("-password").exec()) as Omit<User, "password">;
