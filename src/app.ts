@@ -12,6 +12,8 @@ import TaskRouter from "./apis/v1/routes/task.route";
 import UserRouter from "./apis/v1/routes/user.route";
 import path from "path";
 
+const ROOT_FOLDER = path.join(__dirname, "..");
+const SRC_FOLDER = path.join(ROOT_FOLDER, "src");
 const options: swaggerJSDoc.OAS3Options = {
 	definition: {
 		openapi: "3.0.0",
@@ -26,7 +28,7 @@ const options: swaggerJSDoc.OAS3Options = {
 			},
 		],
 	},
-	apis: ["src/apis/v1/routes/*.ts"],
+	apis: [path.resolve(path.join(SRC_FOLDER, "/apis/v1/routes/*.ts"))],
 };
 
 const app = express();
@@ -54,8 +56,6 @@ app.get("/", async (req, res) => {
 		message: "Server now is running!",
 	});
 });
-const ROOT_FOLDER = path.join(__dirname, "..");
-const SRC_FOLDER = path.join(ROOT_FOLDER, "src");
 app.use("/public", express.static(path.join(SRC_FOLDER, "public")));
 app.use(
 	"/api/docs",
