@@ -49,10 +49,10 @@ app.use("/v1/api", ProjectRouter);
 app.use("/v1/api", TaskRouter);
 
 app.get("/", async (req, res) => {
-    return res.status(200).json({
-        status: 200,
-        message: "Server now is running!",
-    });
+	return res.status(200).json({
+		status: 200,
+		message: "Server now is running!",
+	});
 });
 app.use("/api/docs", swaggerUI.serve, swaggerUI.setup(swaggerJSDoc(options)));
 export default app;
