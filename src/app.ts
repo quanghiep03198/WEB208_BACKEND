@@ -54,6 +54,9 @@ app.get("/", async (req, res) => {
 		message: "Server now is running!",
 	});
 });
+const ROOT_FOLDER = path.join(__dirname, "..");
+const SRC_FOLDER = path.join(ROOT_FOLDER, "src");
+app.use("/public", express.static(path.join(SRC_FOLDER, "public")));
 app.use(
 	"/api/docs",
 	swaggerUI.serve,
