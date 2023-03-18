@@ -14,6 +14,7 @@ import path from "path";
 
 const ROOT_FOLDER = path.join(__dirname, "..");
 const SRC_FOLDER = path.join(ROOT_FOLDER, "src");
+
 const options: swaggerJSDoc.OAS3Options = {
 	definition: {
 		openapi: "3.0.0",
@@ -28,7 +29,7 @@ const options: swaggerJSDoc.OAS3Options = {
 			},
 		],
 	},
-	apis: [path.join(SRC_FOLDER, "apis/v1/routes/*.ts")],
+	apis: ["./src/apis/v1/routes/*.ts"],
 };
 const app = express();
 
@@ -56,7 +57,7 @@ app.get("/", async (req, res) => {
 	});
 });
 app.use("/public", express.static(path.join(SRC_FOLDER, "public")));
-// app.use("/api-docs", swaggerUI.serve);
+
 app.use(
 	"/api-docs",
 	swaggerUI.serve,

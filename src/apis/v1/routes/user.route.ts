@@ -29,7 +29,7 @@ export default UserRouter;
 /**
  * @openapi
  * /login:
- *   tags:
+ *   tags: ['Auth']
  *   post:
  *     description: Basic Auth signin with email and password
  *     requestBody:
