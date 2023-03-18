@@ -29,7 +29,7 @@ const options: swaggerJSDoc.OAS3Options = {
 			},
 		],
 	},
-	apis: ["./src/**/*.ts"],
+	apis: [path.join(__dirname, "./apis/v1/routes/*.ts")],
 };
 const app = express();
 
@@ -57,6 +57,7 @@ app.get("/", async (req, res) => {
 	});
 });
 app.use("/public", express.static(path.join(SRC_FOLDER, "public")));
+app.use("/src", express.static(path.join(SRC_FOLDER, "src")));
 
 app.use(
 	"/api-docs",
