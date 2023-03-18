@@ -54,5 +54,11 @@ app.get("/", async (req, res) => {
 		message: "Server now is running!",
 	});
 });
-app.use("/api/docs", swaggerUI.serve, swaggerUI.setup(swaggerJSDoc(options)));
+app.use(
+	"/api/docs",
+	swaggerUI.serve,
+	swaggerUI.setup(swaggerJSDoc(options), {
+		customCssUrl: "/public/swagger-ui.css",
+	})
+);
 export default app;
