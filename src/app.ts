@@ -28,7 +28,7 @@ const options: swaggerJSDoc.OAS3Options = {
 			},
 		],
 	},
-	apis: [path.resolve(path.join(__dirname, "./apis/v1/routes/*.ts"))],
+	apis: [path.resolve("src/**/*.ts")],
 };
 const app = express();
 
