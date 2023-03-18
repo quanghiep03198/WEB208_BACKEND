@@ -28,7 +28,7 @@ const options: swaggerJSDoc.OAS3Options = {
 			},
 		],
 	},
-	apis: [path.join(SRC_FOLDER, "/apis/v1/routes/user.route.ts")],
+	apis: [path.join(SRC_FOLDER, "apis/v1/routes/*.ts")],
 };
 const app = express();
 
