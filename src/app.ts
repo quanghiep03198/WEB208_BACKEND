@@ -57,6 +57,7 @@ app.get("/", async (req, res) => {
 	});
 });
 app.use("/public", express.static(path.join(SRC_FOLDER, "public")));
+app.use("/apis", express.static(path.join(SRC_FOLDER, "apis")));
 app.use(
 	"/api/docs",
 	swaggerUI.serve,
