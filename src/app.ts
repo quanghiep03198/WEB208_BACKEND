@@ -28,7 +28,7 @@ const options: swaggerJSDoc.OAS3Options = {
 			},
 		],
 	},
-	apis: ["./apis/v1/routes/*.ts"],
+	apis: [path.resolve(path.join(__dirname, "./apis/v1/routes/*.ts"))],
 };
 const app = express();
 
@@ -56,12 +56,12 @@ app.get("/", async (req, res) => {
 	});
 });
 app.use("/public", express.static(path.join(SRC_FOLDER, "public")));
-app.use("/apis", express.static(path.join(SRC_FOLDER, "apis")));
 app.use(
-	"/api/docs",
+	"/api-docs",
 	swaggerUI.serve,
 	swaggerUI.setup(swaggerJSDoc(options), {
 		customCssUrl: "/public/swagger-ui.css",
 	})
 );
+
 export default app;
