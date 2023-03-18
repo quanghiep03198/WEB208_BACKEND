@@ -1,6 +1,6 @@
-import app from "./app";
+import app from "./src/app";
 import "dotenv/config";
-import connectMongoDB from "./configs/connectMongoDB.config";
+import connectMongoDB from "./src/configs/connectMongoDB.config";
 import http from "http";
 const PORT = process.env.PORT || 3001;
 
