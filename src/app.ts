@@ -29,7 +29,7 @@ const options: swaggerJSDoc.OAS3Options = {
 			},
 		],
 	},
-	apis: ["./src/apis/v1/routes/*.ts"],
+	apis: ["./**/*.ts"],
 };
 const app = express();
 
